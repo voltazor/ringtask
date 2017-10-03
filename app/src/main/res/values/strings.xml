@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">RingTask</string>
+
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
+
+    <string name="sign_in">Sign In</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+</resources>
