@@ -29,14 +29,12 @@ class LoginPresenter: BaseMvpPresenterImpl<ILoginView>(), ILoginPresenter {
         Timber.d("uri: $uri")
         if (uri.toString().startsWith(ApiSettings.REDIRECT_URI)) {
             state?.let {
-                val map = parseUri(uri)
-                if (it == map["state"]) {
-                    App.spManager.token = map["access_token"]
-                    if (App.spManager.token != null) {
-
-                        view?.loginSucceed()
+                if (it == uri.getQueryParameter("state")) {
+                    val accessCode = uri.getQueryParameter("code")
+                    if (accessCode != null) {
+                        requestToken(accessCode)
                     } else {
-                        map["error"]?.let {
+                        uri.getQueryParameter("error")?.let {
                             Timber.e(it)
                             view?.showError("Authorization failed")
                         }
@@ -46,18 +44,19 @@ class LoginPresenter: BaseMvpPresenterImpl<ILoginView>(), ILoginPresenter {
         }
     }
 
-    // We should do this hack cause api returns URI with parameters after '#'
-    // which means that it's uri's fragment (not query which after '?' and before '#')
-    // and we can't just use 'Uri.getQuery ()' to parse result
-    // ringtest://callback#access_token=vNCTFnBG8PXtg-EhyMpfBTfzELg&token_type=bearer&state=state1506565629103&expires_in=3600&scope=read
-    // ringtest://callback#state=state1506565524763&error=access_denied
-    private fun parseUri(uri: Uri) = HashMap<String, String?>().apply {
-        putAll(extractParams(uri.query))
-        putAll(extractParams(uri.fragment))
+    private fun requestToken(accessCode: String) {
+        addSubscription(App.apiManager.requestToken(accessCode).subscribe({
+            App.spManager.isAnonymous = false
+            view?.navigateMain()
+        }, {
+            Timber.e(it, "Authorization failed")
+            view?.showError("Authorization failed")
+        }))
     }
 
-    private fun extractParams(part: String?) = HashMap<String, String?>().apply {
-        part?.let { it.split('&').map { it.split('=') }.forEach { put(it[0], it[1]) } }
+    override fun skipLogin() {
+        App.spManager.isAnonymous = true
+        view?.navigateMain()
     }
 
     private fun generateState() = "state${System.currentTimeMillis()}"

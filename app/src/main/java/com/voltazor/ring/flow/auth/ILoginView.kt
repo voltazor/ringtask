@@ -9,6 +9,6 @@ interface ILoginView: IBaseMvpView {
 
     fun openUrl(url: String)
 
-    fun loginSucceed()
+    fun navigateMain()
 
 }

@@ -3,9 +3,10 @@ package com.voltazor.ring.flow.auth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.voltazor.ring.flow.MainActivity
 import com.voltazor.ring.R
 import com.voltazor.ring.base.BaseMvpActivity
+import com.voltazor.ring.flow.MainActivity
+import com.voltazor.ring.onClick
 import com.voltazor.ring.openUrl
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -15,7 +16,10 @@ class LoginActivity : BaseMvpActivity<ILoginView, ILoginPresenter>(), ILoginView
 
     companion object {
 
-        fun newIntent(context: Context): Intent = Intent(context, LoginActivity::class.java)
+        private const val RESULT_EXPECTED = "result_expected"
+
+        fun newIntent(context: Context, resultExpected: Boolean = false): Intent =
+                Intent(context, LoginActivity::class.java).putExtra(RESULT_EXPECTED, resultExpected)
 
     }
 
@@ -26,9 +30,20 @@ class LoginActivity : BaseMvpActivity<ILoginView, ILoginPresenter>(), ILoginView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        signIn.setOnClickListener { presenter.login() }
+        signIn.onClick { presenter.login() }
+
+        skip.onClick { skipLogin() }
 
         handleToken(intent)
+    }
+
+    private fun skipLogin() {
+        if (intent.getBooleanExtra(RESULT_EXPECTED, false)) {
+            setResult(RESULT_CANCELED)
+            finish()
+        } else {
+            presenter.skipLogin()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -37,16 +52,21 @@ class LoginActivity : BaseMvpActivity<ILoginView, ILoginPresenter>(), ILoginView
     }
 
     private fun handleToken(intent: Intent?) {
-        intent?.let { presenter.handleToken(intent.data) }
+        intent?.data?.let { presenter.handleToken(it) }
     }
 
     override fun openUrl(url: String) {
         openUrl(url, true)
     }
 
-    override fun loginSucceed() {
-        startActivity(MainActivity.newIntent(this))
-        finishAffinity()
+    override fun navigateMain() {
+        if (intent.getBooleanExtra(RESULT_EXPECTED, false)) {
+            setResult(RESULT_OK)
+            finish()
+        } else {
+            startActivity(MainActivity.newIntent(this))
+            finishAffinity()
+        }
     }
 
 }

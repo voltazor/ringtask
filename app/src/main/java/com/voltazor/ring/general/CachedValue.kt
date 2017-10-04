@@ -24,7 +24,7 @@ class CachedValue<T>(val name: String, value: T? = null, private val defValue: T
 
     private val lock = Any()
     private var loaded = false
-    var sharedPreferences: SharedPreferences? = null
+    private var sharedPreferences: SharedPreferences? = null
 
     var value: T? = null
         set(value) {

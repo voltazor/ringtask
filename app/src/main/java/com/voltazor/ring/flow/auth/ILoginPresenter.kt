@@ -10,6 +10,8 @@ interface ILoginPresenter: IBaseMvpPresenter<ILoginView> {
 
     fun login()
 
+    fun skipLogin()
+
     fun handleToken(uri: Uri)
 
 }

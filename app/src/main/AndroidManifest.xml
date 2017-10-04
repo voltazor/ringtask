@@ -24,7 +24,8 @@
         </activity>
 
         <activity
-            android:name=".flow.MainActivity"/>
+            android:name=".flow.MainActivity"
+            android:label="@string/reddit_top"/>
 
         <activity
             android:name="com.voltazor.ring.flow.auth.LoginActivity"

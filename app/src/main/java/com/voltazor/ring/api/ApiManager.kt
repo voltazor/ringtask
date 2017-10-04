@@ -1,16 +1,21 @@
 package com.voltazor.ring.api
 
-import com.google.gson.ExclusionStrategy
-import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
+import com.voltazor.ring.App
 import com.voltazor.ring.App.Companion.spManager
 import com.voltazor.ring.BuildConfig
+import com.voltazor.ring.api.ApiSettings.AUTH_BASE_URL
+import com.voltazor.ring.api.ApiSettings.BASE_URL
+import com.voltazor.ring.api.ApiSettings.SSL_BASE_URL
 import com.voltazor.ring.api.deserializer.ListingResponseDeserializer
-import com.voltazor.ring.api.deserializer.StringDeserializer
+import com.voltazor.ring.api.dto.AuthResponse
 import com.voltazor.ring.api.dto.ListingResponse
+import com.voltazor.ring.api.service.AuthService
+import com.voltazor.ring.api.service.NetworkService
 import com.voltazor.ring.model.Listing
-import io.realm.RealmObject
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
@@ -25,48 +30,43 @@ import java.util.concurrent.TimeUnit
  */
 class ApiManager {
 
+    private lateinit var authService: AuthService
     private lateinit var networkService: NetworkService
 
     fun init() {
-        networkService = createRetrofit(createOkHttpClient()).create(NetworkService::class.java)
+        authService = createRetrofitBuilder(false).baseUrl(SSL_BASE_URL).build().create(AuthService::class.java)
+        networkService = createRetrofitBuilder(true).baseUrl(BASE_URL).build().create(NetworkService::class.java)
     }
 
-    private fun createRetrofit(client: OkHttpClient): Retrofit {
-        return Retrofit.Builder().apply {
-            addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            addConverterFactory(createGsonConverter())
-            baseUrl(ApiSettings.BASE_URL)
-            client(client)
-        }.build()
+    private fun createRetrofitBuilder(anonymousMode: Boolean) = Retrofit.Builder().apply {
+        addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+        addConverterFactory(createGsonConverter())
+        client(createOkHttpClient(anonymousMode))
     }
 
     private fun createGsonConverter(): GsonConverterFactory {
         return GsonConverterFactory.create(GsonBuilder().apply {
             serializeNulls()
-            registerTypeAdapter(String::class.java, StringDeserializer())
             registerTypeAdapter(ListingResponse::class.java, ListingResponseDeserializer())
-            setExclusionStrategies(object : ExclusionStrategy {
-                override fun shouldSkipField(f: FieldAttributes) = f.declaringClass == RealmObject::class.java
-
-                override fun shouldSkipClass(clazz: Class<*>) = false
-            })
         }.create())
     }
 
-    private fun createOkHttpClient(): OkHttpClient {
+    private fun createOkHttpClient(anonymousMode: Boolean): OkHttpClient {
         return OkHttpClient.Builder().apply {
             readTimeout(60, TimeUnit.SECONDS)
             connectTimeout(60, TimeUnit.SECONDS)
+            addInterceptor { chain ->
+                val original = chain.request()
+                val request = original.newBuilder().apply {
+                    if (anonymousMode) {
+                        configureRequest(original, this)
+                    }
+                    header("User-Agent", "android:com.voltazor.ring:v1.0.0 (by /u/voltazor)")
+                    spManager.token?.let { header("Authorization", it) }
+                }.build()
+                chain.proceed(request)
+            }
             if (BuildConfig.DEBUG) {
-                addInterceptor { chain ->
-                    val original = chain.request()
-                    val request = original.newBuilder().apply {
-                        header("User-Agent", "android:com.voltazor.ring:v1.0.0 (by /u/voltazor)")
-                        spManager.token?.let { header("Authorization", it) }
-                        method(original.method(), original.body())
-                    }.build()
-                    chain.proceed(request)
-                }
                 addInterceptor(HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY
                 })
@@ -74,12 +74,33 @@ class ApiManager {
         }.build()
     }
 
-    fun requestTop(): Observable<List<Listing>> {
-        return networkService.requestTop()
-                .subscribeOn(Schedulers.io())
-                .retryWhen(LogOutWhenSessionExpired())
-                .map { t -> t.data.children }
-                .observeOn(AndroidSchedulers.mainThread())
+    //We need different hosts for authenticated/anonymous requests
+    private fun configureRequest(original: Request, builder: Request.Builder) {
+        HttpUrl.parse(if (spManager.isAnonymous) BASE_URL else AUTH_BASE_URL)?.let {
+            builder.url(original.url().newBuilder().apply {
+                scheme(it.scheme())
+                host(it.url().toURI().host)
+                port(it.port())
+            }.build())
+            builder.method(original.method(), original.body())
+        }
     }
+
+    fun requestToken(accessCode: String): Observable<AuthResponse> = persistToken(authService.requestAccessToken(accessCode))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+    fun refreshToken(): Observable<AuthResponse> = persistToken(authService.refreshToken(spManager.refreshToken))
+
+    private fun persistToken(observable: Observable<AuthResponse>) = observable.doOnNext {
+        App.spManager.token = "${it.type} ${it.accessToken}"
+        App.spManager.refreshToken = it.refreshToken
+    }
+
+    fun requestTop(): Observable<List<Listing>> = networkService.requestTop()
+            .subscribeOn(Schedulers.io())
+            .retryWhen(LogOutWhenSessionExpired())
+            .map { t -> t.data.children }
+            .observeOn(AndroidSchedulers.mainThread())
 
 }

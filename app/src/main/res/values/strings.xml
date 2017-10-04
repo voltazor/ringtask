@@ -7,4 +7,23 @@
     <string name="sign_in">Sign In</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+
+    <string name="year_format">%dy</string>
+    <string name="month_format">%dmo</string>
+    <string name="day_format">%dd</string>
+    <string name="hour_format">%dh</string>
+    <string name="minute_format">%dm</string>
+
+    <string name="info_format">by %1$s • %2$s ago</string>
+    <string name="reddit_top">Reddit Top</string>
+    <string name="skip">Skip</string>
+    <string name="sign_out">Sign Out</string>
+
+    <plurals name="comments_format">
+        <item quantity="zero">%d comments</item>
+        <item quantity="one">%d comment</item>
+        <item quantity="few">%d comments</item>
+        <item quantity="many">%d comments</item>
+    </plurals>
+
 </resources>

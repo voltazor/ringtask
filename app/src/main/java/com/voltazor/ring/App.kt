@@ -23,8 +23,8 @@ class App: Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        apiManager.init()
         spManager.init(this)
+        apiManager.init()
     }
 
 }

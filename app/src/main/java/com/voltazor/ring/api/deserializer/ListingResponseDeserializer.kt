@@ -3,6 +3,7 @@ package com.voltazor.ring.api.deserializer
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import com.voltazor.ring.api.dto.ListingData
 import com.voltazor.ring.api.dto.ListingResponse
 import com.voltazor.ring.extractString

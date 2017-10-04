@@ -1,8 +1,8 @@
-package com.voltazor.ring.api
+package com.voltazor.ring.api.service
 
 import com.voltazor.ring.api.ApiSettings.TOP
 import com.voltazor.ring.api.dto.ListingResponse
-import retrofit2.http.POST
+import retrofit2.http.GET
 import rx.Observable
 
 /**
@@ -10,7 +10,7 @@ import rx.Observable
  */
 interface NetworkService {
 
-    @POST(TOP)
+    @GET(TOP)
     fun requestTop(): Observable<ListingResponse>
 
 }
