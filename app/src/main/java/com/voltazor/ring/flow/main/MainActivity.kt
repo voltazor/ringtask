@@ -6,6 +6,8 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING
+import android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING
 import android.text.SpannableString
 import android.text.style.StyleSpan
 import android.view.Menu
@@ -39,6 +41,7 @@ class MainActivity : BaseMvpActivity<IMainView, IMainPresenter>(R.layout.activit
 
     override val presenter = MainPresenter()
 
+    private val layoutManager: LinearLayoutManager by lazy { LinearLayoutManager(this) }
     private val adapter: ListingAdapter by lazy { ListingAdapter(this, this, this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +49,14 @@ class MainActivity : BaseMvpActivity<IMainView, IMainPresenter>(R.layout.activit
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
         swipeRefresh.setOnRefreshListener { loadListings() }
 
-        list.layoutManager = LinearLayoutManager(this)
+        toTop.setOnClickListener({
+            list.scrollToPosition(0)
+            appBarLayout.setExpanded(true)
+        })
+        toTop.translationY = 2f * toTop.height
+
+        list.layoutManager = layoutManager
+        list.addOnScrollListener(FABScrollListener())
         list.addItemDecoration(ItemDecoration(this))
         list.adapter = adapter
         loadListings()
@@ -148,6 +158,28 @@ class MainActivity : BaseMvpActivity<IMainView, IMainPresenter>(R.layout.activit
                     setSpan(StyleSpan(Typeface.BOLD), index, index + userName.length, 0)
                 }
             }
+        }
+
+    }
+
+    private inner class FABScrollListener : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            if (layoutManager.findFirstVisibleItemPosition() >= 3) {
+                animateUp()
+            } else {
+                animateDown()
+            }
+        }
+
+        private fun animateUp() {
+            toTop.animate().cancel()
+            toTop.animate().translationY(0f)
+        }
+
+        private fun animateDown() {
+            toTop.animate().cancel()
+            toTop.animate().translationY(2f * toTop.height)
         }
 
     }
