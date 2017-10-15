@@ -7,7 +7,7 @@ import com.voltazor.ring.showToast
 /**
  * Created by voltazor on 03/10/17.
  */
-abstract class BaseMvpActivity<V : IBaseMvpView, out T : IBaseMvpPresenter<V>> : BaseActivity(), IBaseMvpView {
+abstract class BaseMvpActivity<V : IBaseMvpView, out T : IBaseMvpPresenter<V>>(layoutResourceId: Int) : BaseActivity(layoutResourceId), IBaseMvpView {
 
     protected abstract val presenter: T
 

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.voltazor.ring.App.Companion.spManager
 import com.voltazor.ring.flow.auth.LoginActivity
+import com.voltazor.ring.flow.main.MainActivity
 
 /**
  * Created by voltazor on 27/09/17.

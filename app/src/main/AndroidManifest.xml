@@ -24,15 +24,15 @@
         </activity>
 
         <activity
-            android:name=".flow.MainActivity"
+            android:name=".flow.main.MainActivity"
+            android:configChanges="keyboard|orientation|screenSize"
             android:label="@string/reddit_top"/>
 
         <activity
-            android:name="com.voltazor.ring.flow.auth.LoginActivity"
+            android:name=".flow.auth.LoginActivity"
             android:configChanges="keyboard|orientation|screenSize"
             android:label="@string/sign_in"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.Login">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

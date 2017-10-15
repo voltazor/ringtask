@@ -5,6 +5,7 @@ import android.support.annotation.StringRes
 import com.trello.navi.Event
 import com.trello.navi.NaviComponent
 import com.trello.navi.rx.RxNavi
+import com.voltazor.ring.App
 import rx.Subscription
 import rx.internal.util.SubscriptionList
 
@@ -14,6 +15,9 @@ import rx.internal.util.SubscriptionList
 open class BaseMvpPresenterImpl<V> : IBaseMvpPresenter<V> where V : IBaseMvpView, V : NaviComponent {
 
     protected var view: V? = null
+
+    protected val apiManager = App.apiManager
+    protected val spManager = App.spManager
 
     private val subscriptionList = SubscriptionList()
 

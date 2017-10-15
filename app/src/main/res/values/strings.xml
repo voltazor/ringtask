@@ -16,8 +16,10 @@
 
     <string name="info_format">by %1$s • %2$s ago</string>
     <string name="reddit_top">Reddit Top</string>
-    <string name="skip">Skip</string>
+    <string name="anonymous">Anonymous</string>
     <string name="sign_out">Sign Out</string>
+    <string name="auth_failed">Authorization failed</string>
+    <string name="request_failed">Request failed</string>
 
     <plurals name="comments_format">
         <item quantity="zero">%d comments</item>

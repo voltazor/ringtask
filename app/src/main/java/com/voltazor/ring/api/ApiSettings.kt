@@ -33,4 +33,8 @@ object ApiSettings {
 
     const val TOP = "/top.$TYPE"
 
+    const val AFTER = "after"
+    const val LIMIT = "limit"
+    const val COUNT = "count"
+
 }

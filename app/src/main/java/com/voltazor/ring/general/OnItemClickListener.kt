@@ -1,4 +1,4 @@
-package com.voltazor.ring.base
+package com.voltazor.ring.general
 
 import android.view.View
 

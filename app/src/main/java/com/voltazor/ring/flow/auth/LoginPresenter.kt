@@ -2,7 +2,7 @@ package com.voltazor.ring.flow.auth
 
 import android.net.Uri
 import android.os.Bundle
-import com.voltazor.ring.App
+import com.voltazor.ring.R
 import com.voltazor.ring.api.ApiSettings
 import com.voltazor.ring.base.BaseMvpPresenterImpl
 import timber.log.Timber
@@ -36,7 +36,7 @@ class LoginPresenter: BaseMvpPresenterImpl<ILoginView>(), ILoginPresenter {
                     } else {
                         uri.getQueryParameter("error")?.let {
                             Timber.e(it)
-                            view?.showError("Authorization failed")
+                            view?.showError(getString(R.string.auth_failed))
                         }
                     }
                 }
@@ -45,17 +45,17 @@ class LoginPresenter: BaseMvpPresenterImpl<ILoginView>(), ILoginPresenter {
     }
 
     private fun requestToken(accessCode: String) {
-        addSubscription(App.apiManager.requestToken(accessCode).subscribe({
-            App.spManager.isAnonymous = false
+        addSubscription(apiManager.requestToken(accessCode).subscribe({
+            spManager.isAnonymous = false
             view?.navigateMain()
         }, {
             Timber.e(it, "Authorization failed")
-            view?.showError("Authorization failed")
+            view?.showError(getString(R.string.auth_failed))
         }))
     }
 
     override fun skipLogin() {
-        App.spManager.isAnonymous = true
+        spManager.isAnonymous = true
         view?.navigateMain()
     }
 

@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import com.voltazor.ring.R
 import com.voltazor.ring.base.BaseMvpActivity
-import com.voltazor.ring.flow.MainActivity
+import com.voltazor.ring.flow.main.MainActivity
 import com.voltazor.ring.onClick
 import com.voltazor.ring.openUrl
 import kotlinx.android.synthetic.main.activity_login.*
 
-class LoginActivity : BaseMvpActivity<ILoginView, ILoginPresenter>(), ILoginView {
+class LoginActivity : BaseMvpActivity<ILoginView, ILoginPresenter>(R.layout.activity_login), ILoginView {
 
     override val presenter = LoginPresenter()
 
@@ -23,16 +23,12 @@ class LoginActivity : BaseMvpActivity<ILoginView, ILoginPresenter>(), ILoginView
 
     }
 
-    override val layoutResourceId: Int
-        get() = R.layout.activity_login
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         signIn.onClick { presenter.login() }
 
-        skip.onClick { skipLogin() }
+        anonymous.onClick { skipLogin() }
 
         handleToken(intent)
     }

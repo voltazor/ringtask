@@ -7,4 +7,5 @@
     android:layout_height="wrap_content"
     app:titleTextColor="?attr/colorAccent"
     android:background="?attr/colorPrimary"
+    app:layout_scrollFlags="scroll|enterAlways|snap"
     android:theme="@style/AppTheme"/>

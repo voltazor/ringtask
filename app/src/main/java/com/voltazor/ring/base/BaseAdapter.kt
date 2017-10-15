@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.annotation.StringRes
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import com.voltazor.ring.general.OnItemClickListener
 import com.voltazor.ring.onClick
 import java.util.concurrent.CopyOnWriteArrayList
 
