@@ -6,8 +6,6 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING
-import android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING
 import android.text.SpannableString
 import android.text.style.StyleSpan
 import android.view.Menu
@@ -19,8 +17,8 @@ import com.voltazor.ring.base.BaseAdapter
 import com.voltazor.ring.base.BaseMvpActivity
 import com.voltazor.ring.flow.LaunchActivity
 import com.voltazor.ring.flow.auth.LoginActivity
-import com.voltazor.ring.general.OnItemClickListener
 import com.voltazor.ring.general.ItemDecoration
+import com.voltazor.ring.general.OnItemClickListener
 import com.voltazor.ring.general.OnNextPageListener
 import com.voltazor.ring.model.Post
 import kotlinx.android.synthetic.main.activity_main.*
